@@ -15,6 +15,9 @@ This application is built using Java 8 + Spring Boot with the support of the fol
 ## Features
 
 - Register restaurants that have leftover food and when they are available for pick ups.
+
+## Planned Features
+
 - Register shelter of other places that may need the leftover food. **(Not implemented yet)**
 - Register courriers that will take the leftover food from the restaurants to those shelters. **(Not implemented yet)**
 - Provide the courriers with the best route of the available restaurants. **(Not implemented yet)**
