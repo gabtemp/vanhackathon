@@ -21,6 +21,16 @@ This application is built using Java 8 + Spring Boot with the support of the fol
 - Register shelter of other places that may need the leftover food. **(Not implemented yet)**
 - Register courriers that will take the leftover food from the restaurants to those shelters. **(Not implemented yet)**
 - Provide the courriers with the best route of the available restaurants. **(Not implemented yet)**
+## Build
+
+To build and run the application just run the following commands on the root folder of the project
+
+```
+mvn clean package
+docker-compose up --build
+```
+
+And the application will be available on `http://localhost:8080/`
 
 ## Usage
 
