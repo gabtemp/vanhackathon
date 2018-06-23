@@ -41,7 +41,7 @@ public class RestaurantResource {
     public Response findById(@PathParam("id") Long id) {
         Optional<Restaurant> restaurant = repository.findById(id);
         if (restaurant.isPresent()) {
-            return Response.ok(restaurant).build();
+            return Response.ok(restaurant.get()).build();
         } else {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
