@@ -45,12 +45,11 @@ directly via ID (`/restaurant/{id}`).
 
 #### Create new restaurant ####
 - Path: `/`
-- Body: ```{
-  "name": "Restaurant name",
-  "address": "Restaurant St.",
-  "pickUpDays": "FRIDAY, SATURDAY",
-  "pickUpTime": "22:45",
-}```
+- Form parameters:
+  - name: The name of the restaurant,
+  - address: The address of the restaurant,
+  - pickUpDays: A comma separated list of the week days that the restaurant is available for pick-ups. E.g.: "FRIDAY,SATURDAY,SUNDAY".
+  - pickUpTime: The time that the restaurant is available in the format `hh:mm`.
 
   Registers a new restaurant, if successful the newly created restaurant will be displayed with it's generated id with a 201 HTT status. If unsuccessful a 400 status will be displayed.
   All fields are required, except `pickUpDays` that has a default value of `MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY`.
