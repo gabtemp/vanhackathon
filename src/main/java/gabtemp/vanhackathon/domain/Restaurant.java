@@ -2,6 +2,7 @@ package gabtemp.vanhackathon.domain;
 
 import java.time.DayOfWeek;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Set;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,6 +13,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+
+import com.google.common.base.MoreObjects;
 
 @Entity
 @Table(name = "RESTAURANT")
@@ -74,5 +77,33 @@ public class Restaurant {
 
     public void setPickUpTime(LocalTime pickUpTime) {
         this.pickUpTime = pickUpTime;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Restaurant that = (Restaurant) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                          .add("id", id)
+                          .add("name", name)
+                          .add("address", address)
+                          .add("availablePickUpDays", availablePickUpDays)
+                          .add("pickUpTime", pickUpTime)
+                          .toString();
     }
 }

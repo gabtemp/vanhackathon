@@ -4,8 +4,13 @@ import java.net.URI;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.time.format.DateTimeParseException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -22,6 +27,8 @@ import gabtemp.vanhackathon.domain.Restaurant;
 import gabtemp.vanhackathon.repository.RestaurantRepository;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
+
+import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 
 @Component
 @Path("/restaurant")
@@ -60,18 +67,46 @@ public class RestaurantResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response create(@FormParam("name") String name, @FormParam("address") String address,
-            @FormParam("day") String day, @FormParam("time") String time) {
-        LOG.info("Registering new restaurant with the following parameters:" +
-                "Name=" + name +
-                "Address=" + address +
-                "PickUpDays=" + day +
-                "PickUpTime=" + time);
+            @FormParam("pickUpDays") List<String> days, @FormParam("pickUpTime") String time) {
+        LOG.info("Registering new restaurant with the following parameters: " +
+                "Name=" + name + ", Address=" + address +
+                ", PickUpDays=" + days + ", PickUpTime=" + time);
+
+        if (name == null) {
+            LOG.warn("Failed to register a new restaurant: 'Form parameter 'name' is mandatory'");
+            return Response.status(BAD_REQUEST).entity("Form parameter 'name' is mandatory").build();
+        }
+
+        if (address == null) {
+            LOG.warn("Failed to register a new restaurant: 'Form parameter 'address' is mandatory'");
+            return Response.status(BAD_REQUEST).entity("Form parameter 'address' is mandatory").build();
+        }
+
+        if (time == null) {
+            LOG.warn("Failed to register a new restaurant: 'Form parameter 'pickUpTime' is mandatory'");
+            return Response.status(BAD_REQUEST).entity("Form parameter 'pickUpTime' is mandatory").build();
+        }
+
+        Set<DayOfWeek> resolvedDays;
+        if (days == null || days.isEmpty()) {
+            LOG.info("Form parameter 'pickUpDays' not provided. Using all values.");
+            resolvedDays = new HashSet<>(Arrays.asList(DayOfWeek.values()));
+        } else {
+            resolvedDays = days.stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
+        }
 
         Restaurant restaurant = new Restaurant();
         restaurant.setName(name);
         restaurant.setAddress(address);
-        restaurant.setAvailablePickUpDays(Collections.singleton(DayOfWeek.valueOf(day)));
-        restaurant.setPickUpTime(LocalTime.parse(time, DateTimeFormatter.ISO_TIME));
+        restaurant.setAvailablePickUpDays(resolvedDays);
+        try {
+            restaurant.setPickUpTime(LocalTime.parse(time, DateTimeFormatter.ISO_TIME));
+        } catch (DateTimeParseException e) {
+            String message = "Invalid time format (" + time + ") for the 'pickUpTime' field. The allowed format is 'hh:mm'," +
+                    " where 'hh' is the hour from 0 to 23 and 'mm' are the minutes from 0 to 59.";
+            LOG.error(message, e);
+            return Response.status(BAD_REQUEST).entity(message).build();
+        }
 
         Restaurant saved = repository.save(restaurant);
         LOG.info("New restaurant registered with id " + saved.getId());
