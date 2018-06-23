@@ -27,7 +27,8 @@ import javax.ws.rs.core.Response;
 import com.google.common.collect.Iterables;
 import gabtemp.vanhackathon.domain.Restaurant;
 import gabtemp.vanhackathon.repository.RestaurantRepository;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
@@ -39,7 +40,7 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 @Path("/restaurant")
 public class RestaurantResource {
 
-    private final Logger LOG = Logger.getLogger(RestaurantResource.class);
+    private final Logger LOG = LoggerFactory.getLogger(RestaurantResource.class);
 
     @Resource
     private RestaurantRepository repository;
