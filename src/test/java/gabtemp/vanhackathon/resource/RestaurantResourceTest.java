@@ -18,7 +18,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import static java.time.DayOfWeek.MONDAY;
 import static java.time.DayOfWeek.SUNDAY;
 import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
@@ -77,22 +76,22 @@ public class RestaurantResourceTest {
     @Test
     public void testCreateWithoutRequiredField() {
         Response response;
-        response = resource.create(null, "address", singletonList("FRIDAY"), "23:15");
+        response = resource.create(null, "address", "FRIDAY", "23:15");
         assertThat("POST name missing - response code: ", response.getStatus(), is(BAD_REQUEST.getStatusCode()));
         assertThat("POST name missing - response entity: ", response.getEntity(),
                 is("Form parameter 'name' is mandatory"));
 
-        response = resource.create("name", null, singletonList("FRIDAY"), "23:15");
+        response = resource.create("name", null, ("FRIDAY"), "23:15");
         assertThat("POST address missing - response code: ", response.getStatus(), is(BAD_REQUEST.getStatusCode()));
         assertThat("POST address missing - response entity: ", response.getEntity(),
                 is("Form parameter 'address' is mandatory"));
 
-        response = resource.create("name", "address", singletonList("FRIDAY"), null);
+        response = resource.create("name", "address", ("FRIDAY"), null);
         assertThat("POST pickUpTime missing - response code: ", response.getStatus(), is(BAD_REQUEST.getStatusCode()));
         assertThat("POST pickUpTime missing - response entity: ", response.getEntity(),
                 is("Form parameter 'pickUpTime' is mandatory"));
 
-        response = resource.create("name", "address", singletonList("FRIDAY"), "29:63");
+        response = resource.create("name", "address", ("FRIDAY"), "29:63");
         assertThat("POST pickUpTime invalid - response code: ", response.getStatus(), is(BAD_REQUEST.getStatusCode()));
         assertThat("POST pickUpTime invalid - response entity: ", response.getEntity(),
                 is("Invalid time format (29:63) for the 'pickUpTime' field. The allowed format is 'hh:mm', " +
@@ -110,7 +109,7 @@ public class RestaurantResourceTest {
         Restaurant expected = new Restaurant();
         expected.setId(1L);
 
-        Response response = resource.create("name", "address", asList("FRIDAY", "SUNDAY"), "23:15");
+        Response response = resource.create("name", "address", "FRIDAY,SUNDAY", "23:15");
         assertThat("POST successful - response code: ", response.getStatus(), is(201));
         assertThat("POST successful - response entity: ", response.getEntity(), is(expected));
     }
@@ -140,7 +139,7 @@ public class RestaurantResourceTest {
         when(repository.save(any(Restaurant.class))).thenAnswer(
                 invocationOnMock -> invocationOnMock.<Restaurant>getArgument(0));
 
-        Response response = resource.update(35L, "New Address", "New Address", asList("SUNDAY", "MONDAY"), "22:15");
+        Response response = resource.update(35L, "New Address", "New Address", "SUNDAY,MONDAY", "22:15");
         Restaurant updated = (Restaurant) response.getEntity();
 
         assertThat("PUT successful - response code: ", response.getStatus(), is(200));

@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -96,7 +95,7 @@ public class RestaurantResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response create(@FormParam("name") String name, @FormParam("address") String address,
-            @FormParam("pickUpDays") List<String> pickUpDays, @FormParam("pickUpTime") String time) {
+            @FormParam("pickUpDays") String pickUpDays, @FormParam("pickUpTime") String time) {
         LOG.info("Registering new restaurant with the following parameters: " +
                 "Name=" + name + ", Address=" + address +
                 ", PickUpDays=" + pickUpDays + ", PickUpTime=" + time);
@@ -121,7 +120,7 @@ public class RestaurantResource {
             LOG.info("Form parameter 'pickUpDays' not provided. Using all values.");
             resolvedDays = new HashSet<>(Arrays.asList(DayOfWeek.values()));
         } else {
-            resolvedDays = pickUpDays.stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
+            resolvedDays = Arrays.stream(pickUpDays.split(",")).map(DayOfWeek::valueOf).collect(Collectors.toSet());
         }
 
         Restaurant restaurant = new Restaurant();
@@ -158,7 +157,7 @@ public class RestaurantResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response update(@PathParam("id") Long id, @FormParam("name") String name,
-            @FormParam("address") String address, @FormParam("pickUpDays") List<String> pickUpDays,
+            @FormParam("address") String address, @FormParam("pickUpDays") String pickUpDays,
             @FormParam("pickUpTime") String time) {
 
         LOG.info("Updating existing restaurant with the following parameters: " +
@@ -182,7 +181,7 @@ public class RestaurantResource {
         }
 
         if (pickUpDays != null && !pickUpDays.isEmpty()) {
-            Set<DayOfWeek> resolvedDays = pickUpDays.stream().map(DayOfWeek::valueOf).collect(Collectors.toSet());
+            Set<DayOfWeek> resolvedDays = Arrays.stream(pickUpDays.split(",")).map(DayOfWeek::valueOf).collect(Collectors.toSet());
             updated.setAvailablePickUpDays(resolvedDays);
         }
 
